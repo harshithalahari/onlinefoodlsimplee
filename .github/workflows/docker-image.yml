@@ -10,57 +10,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1 — Checkout code (with LFS & full history so exec bit is preserved)
+      # Step 1 — Checkout code
       - name: Checkout Repository
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          lfs: true
-
-      # Optional debug: show repo root so we can see what's present in logs
-      - name: Debug: list repo root
-        run: |
-          echo "PWD: $(pwd)"
-          echo "--- repo root listing ---"
-          ls -la || true
-
-      # Step: show .dockerignore (helps debug if mvnw is excluded)
-      - name: Debug: show .dockerignore (if present)
-        run: |
-          if [ -f .dockerignore ]; then
-            echo "---- .dockerignore ----"
-            sed -n '1,200p' .dockerignore
-            echo "-----------------------"
-          else
-            echo ".dockerignore not present"
-          fi
-
-      # Ensure mvnw is present and executable in repo root or backend context
-      - name: Ensure mvnw exists & is executable (backend context)
-        run: |
-          # Try backend context first
-          BACKEND_CTX=Ecommerce-backend/fooddelivery
-          if [ -f "${BACKEND_CTX}/mvnw" ]; then
-            echo "Found mvnw in ${BACKEND_CTX}"
-            chmod +x "${BACKEND_CTX}/mvnw"
-            ls -la "${BACKEND_CTX}/mvnw"
-          elif [ -f mvnw ]; then
-            echo "Found mvnw in repo root"
-            chmod +x mvnw
-            ls -la mvnw
-          else
-            echo "WARNING: mvnw not found in either repo root or ${BACKEND_CTX}"
-            echo "Listing ${BACKEND_CTX}:"
-            ls -la "${BACKEND_CTX}" || true
-          fi
-
-      # Optional: print backend context top-level so we can inspect what will be sent as build context
-      - name: Debug: list backend context
-        run: |
-          echo "Listing Ecommerce-backend/fooddelivery"
-          ls -la Ecommerce-backend/fooddelivery || true
-          echo "Listing Ecommerce-backend"
-          ls -la Ecommerce-backend || true
 
       # Step 2 — Set up Docker Buildx
       - name: Set up Docker Buildx
@@ -81,13 +33,6 @@ jobs:
           file: ./Ecommerce-backend/fooddelivery/backend.Dockerfile
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/sdp-kubernetes-backend:latest
-
-      # Step: Debug show frontend context
-      - name: Debug: list frontend context
-        run: |
-          echo "Listing Ecommerce (frontend context)"
-          ls -la Ecommerce || true
-          ls -la Ecommerce/frontend* || true
 
       # Step 5 — Build & Push Frontend Image
       - name: Build and Push Frontend Image
