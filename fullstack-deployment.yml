@@ -71,7 +71,7 @@ spec:
     spec:
       containers:
         - name: backend
-          image: rahuletyala/sdp-kubernetes-backend:latest  # <-- change this
+          image: harshitha932/sdp-kubernetes-backend:latest  # <-- change this
           ports:
             - containerPort: 3000
 ---
@@ -110,7 +110,7 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: rahuletyala/sdp-kubernetes-frontend:latest  # <-- change this
+          image: harshitha932/sdp-kubernetes-frontend:latest  # <-- change this
           ports:
             - containerPort: 80
           # env:
