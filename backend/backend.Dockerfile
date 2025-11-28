@@ -3,19 +3,22 @@ FROM eclipse-temurin:21-jdk AS builder
 
 WORKDIR /app
 
-COPY mvnw .          
+# copy wrapper and .mvn first (so they get cached)
+COPY mvnw . 
 COPY .mvn/ .mvn
 
-#RUN chmod +x mvnw
+# ensure wrapper is executable
+RUN chmod +x mvnw
 
-COPY pom.xml ./
+# copy pom and source
+COPY pom.xml .
 COPY src ./src
 
+# run the wrapper to build
 RUN ./mvnw clean package -DskipTests
 
 # Stage 2: Run the app
 FROM eclipse-temurin:21-jdk
-
 
 WORKDIR /app
 COPY --from=builder /app/target/*.jar app.jar
